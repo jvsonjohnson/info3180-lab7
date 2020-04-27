@@ -1,6 +1,6 @@
 /* Add your Application JavaScript */
-Vue.component('app-header', {
-    template: `
+Vue.component("app-header", {
+  template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
       <a class="navbar-brand" href="#">Lab 7</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -12,59 +12,110 @@ Vue.component('app-header', {
           <li class="nav-item active">
             <router-link class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
           </li>
+          <li class="nav-item">
+            <router-link to="/upload" class="nav-link" href="#">Upload</router-link>
+          </li>
         </ul>
       </div>
     </nav>
-    `
+    `,
 });
 
-Vue.component('app-footer', {
-    template: `
+Vue.component("app-footer", {
+  template: `
     <footer>
         <div class="container">
             <p>Copyright &copy; Flask Inc.</p>
         </div>
     </footer>
-    `
+    `,
 });
 
-const Home = Vue.component('home', {
-   template: `
+const Home = Vue.component("home", {
+  template: `
     <div class="jumbotron">
         <h1>Lab 7</h1>
         <p class="lead">In this lab we will demonstrate VueJS working with Forms and Form Validation from Flask-WTF.</p>
     </div>
    `,
-    data: function() {
-       return {}
-    }
+  data: function () {
+    return {};
+  },
 });
 
-const NotFound = Vue.component('not-found', {
-    template: `
+const UploadForm = Vue.component("upload-form", {
+  template: `
+    <form
+        v-on:submit.prevent="uploadPhoto"
+        method="POST"
+        action="/api/upload"
+        enctype="multipart/form-data"
+        id="uploadForm"
+    >  
+        <div class="form-group">
+            <div class="textarea">
+                <label>Description</label>
+                <input type="text" name="description" />
+            </div>
+            <input type="file" name="photo" />
+            <div class=""><button type="submit">Submit</button></div>
+        </div>
+    </form>
+     `,
+  data: function () {
+    return {};
+  },
+  methods: {
+    uploadPhoto: function () {
+      let self = this;
+      let uploadForm = document.getElementById("uploadForm");
+      let form_data = new FormData(uploadForm);
+      fetch("/api/upload", {
+        method: "POST",
+        body: form_data,
+        headers: {
+          "X-CSRFToken": token,
+        },
+      })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (jsonResponse) {
+          // display a success message
+          console.log(jsonResponse);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    },
+  },
+});
+
+const NotFound = Vue.component("not-found", {
+  template: `
     <div>
         <h1>404 - Not Found</h1>
     </div>
     `,
-    data: function () {
-        return {}
-    }
-})
+  data: function () {
+    return {};
+  },
+});
 
 // Define Routes
 const router = new VueRouter({
-    mode: 'history',
-    routes: [
-        {path: "/", component: Home},
-        // Put other routes here
-
-        // This is a catch all route in case none of the above matches
-        {path: "*", component: NotFound}
-    ]
+  mode: "history",
+  routes: [
+    { path: "/", component: Home },
+    // Put other routes here
+    { path: "/upload", component: UploadForm },
+    // This is a catch all route in case none of the above matches
+    { path: "*", component: NotFound },
+  ],
 });
 
 // Instantiate our main Vue Instance
 let app = new Vue({
-    el: "#app",
-    router
+  el: "#app",
+  router,
 });

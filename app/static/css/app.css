@@ -1,3 +1,13 @@
 body {
     padding-top: 5rem;
 }
+
+.form-group {
+    padding: 20px;
+    display: grid;
+    grid-row-gap: 20px;
+}
+
+.form-group .textarea {
+    width: 250px;
+}
